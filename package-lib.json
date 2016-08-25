@@ -1,5 +1,5 @@
 {
-	"version" : "0.1.0",
+	"version" : "0.1.1",
 	"name" : "jcollection-builders",
 	"description" : "Java collection helpers for creating, filtering, and mapping lists, collections, maps, iterators, and streams",
 	"homepage" : "https://github.com/TeamworkGuy2/JCollectionFiller",

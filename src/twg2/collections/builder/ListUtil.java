@@ -195,8 +195,7 @@ public final class ListUtil {
 	 */
 	public static final <E, R, S extends Collection<R>> S map(Iterable<? extends E> coll, Function<E, R> transformer, S dst) {
 		if(coll instanceof List && coll instanceof RandomAccess) {
-			@SuppressWarnings("unchecked")
-			List<E> collList = (List<E>)coll;
+			List<? extends E> collList = (List<? extends E>)coll;
 			for(int i = 0, size = collList.size(); i < size; i++) {
 				R elem = transformer.apply(collList.get(i));
 				dst.add(elem);
@@ -213,7 +212,7 @@ public final class ListUtil {
 
 
 	@SafeVarargs
-	public static final <E, R> List<R> map(Function<E, R> transformer, E... values) {
+	public static final <E, R> List<R> map(Function<? super E, R> transformer, E... values) {
 		return map(transformer, new ArrayList<>(values.length), values);
 	}
 
@@ -225,11 +224,28 @@ public final class ListUtil {
 	 * @return the input {@code dst} collection filled with the transformed values
 	 */
 	@SafeVarargs
-	public static final <E, R, S extends Collection<R>> S map(Function<E, R> transformer, S dst, E... values) {
+	public static final <E, R, S extends Collection<R>> S map(Function<? super E, R> transformer, S dst, E... values) {
 		for(E elem : values) {
 			R obj = transformer.apply(elem);
 			dst.add(obj);
 		}
+		return dst;
+	}
+
+
+	/** Map an array of values to an {@link ArrayList}
+	 * @param values the array of values
+	 * @param convert the function to transform the input list values
+	 * @return the specified array subset transformed via the {@code convert} function into an {@code ArrayList}
+	 */
+	public static final <T, R> List<R> map(T[] values, int off, int len, Function<? super T, R> convert) {
+		ArrayList<R> dst = new ArrayList<R>();
+
+		for(int i = off, size = off + len; i < size; i++) {
+			R res = convert.apply(values[i]);
+			dst.add(res);
+		}
+
 		return dst;
 	}
 
