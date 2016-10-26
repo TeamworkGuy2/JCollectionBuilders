@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 import org.junit.Assert;
 import org.junit.Test;
 
+import twg2.collections.builder.AddCondition;
+import twg2.collections.builder.ListAdd;
 import twg2.collections.builder.ListUtil;
 
 /**
@@ -18,6 +20,18 @@ import twg2.collections.builder.ListUtil;
  * @since 2016-3-1
  */
 public class ListUtilTest {
+
+	@Test
+	public void combineArrayTest() {
+		List<Integer> set1 = Arrays.asList(1, 2, 4, 8, 16, 32);
+		List<Integer> set2 = Arrays.asList(0, 1, 1, 2, 3, 5);
+
+		Integer[] res = new Integer[set1.size()];
+		ListUtil.combineArray(set1, set2, (a, b) -> a + b, res);
+
+		Assert.assertArrayEquals(new Integer[] { 1, 3, 5, 10, 19, 37 }, res);
+	}
+
 
 	@Test
 	public void combineTest() {
@@ -105,6 +119,26 @@ public class ListUtilTest {
 
 			res = ListUtil.map(inputs.get(i).stream(), (s) -> pair(s.length(), s), new ArrayList<>());
 			Assert.assertEquals(expected.get(i), res);
+		}
+	}
+
+
+	@Test
+	public void copyOfKeysTest() {
+		{
+			List<String> list1 = Arrays.asList("alpha", "beta", "charlie", "gamma");
+			List<String> expect1 = list1;
+			List<String> res1 = ListAdd.copy(list1, AddCondition.NO_NULL_OR_CONTAINS);
+
+			Assert.assertEquals(expect1, res1);
+		}
+
+		{
+			List<String> list2 = Arrays.asList("alpha", "beta", "charlie", "gamma", "beta", null);
+			List<String> expect2 = Arrays.asList("alpha", "beta", "charlie", "gamma");
+			List<String> res2 = ListAdd.copy(list2, AddCondition.NO_NULL_OR_CONTAINS);
+
+			Assert.assertEquals(expect2, res2);
 		}
 	}
 

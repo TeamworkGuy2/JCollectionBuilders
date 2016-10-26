@@ -21,32 +21,47 @@ import twg2.collections.builder.MapBuilder;
  * @since 2014-12-16
  */
 public final class MapBuilderTest {
+	@SuppressWarnings("unchecked")
+	Entry<String, String>[] list1 = new Entry[] {
+		pair("__a", "alpha"),
+		pair("__b", "beta"),
+		pair("__c", "charlie"), // conflicting
+		pair("__c", "gamma") // conflicting
+	};
+
+	@SuppressWarnings("unchecked")
+	Entry<String, String>[] expect1 = new Entry[] {
+		pair("__a", "alpha"),
+		pair("__b", "beta"),
+		pair("__c", "gamma") // last conflict overwrites previous
+	};
+
+	Comparator<Entry<String, String>> strComparator = (a, b) -> a.getKey().compareTo(b.getKey());
+
 
 	@Test
-	public void mapBuilderTest() {
-		@SuppressWarnings("unchecked")
-		Entry<String, String>[] list1 = new Entry[] {
-				new AbstractMap.SimpleImmutableEntry<>("__a", "alpha"),
-				new AbstractMap.SimpleImmutableEntry<>("__b", "beta"),
-				new AbstractMap.SimpleImmutableEntry<>("__c", "charlie"), // conflicting
-				new AbstractMap.SimpleImmutableEntry<>("__c", "gamma") // conflicting
-		};
-
-		@SuppressWarnings("unchecked")
-		Entry<String, String>[] expect1 = new Entry[] {
-				new AbstractMap.SimpleImmutableEntry<>("__a", "alpha"),
-				new AbstractMap.SimpleImmutableEntry<>("__b", "beta"),
-				new AbstractMap.SimpleImmutableEntry<>("__c", "gamma") // last conflict overwrites previous
-		};
-
+	public void mapBuilderImmutableTest() {
 		Map<String, String> map = MapBuilder.of(Arrays.asList(list1).iterator());
 		List<Entry<String, String>> listA = new ArrayList<>(map.entrySet());
-		List<Entry<String, String>> listB = Arrays.asList(expect1);
+		List<Entry<String, String>> expectB = Arrays.asList(expect1);
 		// sort the lists since one came from a map
-		Comparator<Entry<String, String>> comparator = (a, b) -> a.getKey().compareTo(b.getKey());
-		Collections.sort(listA, comparator);
-		Collections.sort(listB, comparator);
-		Assert.assertEquals(listA, listB);
+		Collections.sort(listA, strComparator);
+		Collections.sort(expectB, strComparator);
+		Assert.assertEquals(expectB, listA);
+	}
+
+
+	@Test
+	public void mapBuilderMutableTest() {
+		Map<String, String> map = MapBuilder.mutable(Arrays.asList(list1));
+		String rmd = map.remove("__a");
+		map.put("__a", rmd);
+		List<Entry<String, String>> listA = new ArrayList<>(map.entrySet());
+		List<Entry<String, String>> expectB = Arrays.asList(expect1);
+		// sort the lists since one came from a map
+		Collections.sort(listA, strComparator);
+		Collections.sort(expectB, strComparator);
+		Assert.assertEquals(expectB, listA);
 	}
 
 
@@ -112,6 +127,11 @@ public final class MapBuilderTest {
 			Map<String, RetentionPolicy> map = MapBuilder.immutableEnumNames(RetentionPolicy.class, (r) -> r.name() + "@" + r.hashCode());
 			Assert.assertEquals(expect, map);
 		}
+	}
+
+
+	private static final <K, V> Entry<K, V> pair(K k, V v) {
+		return new AbstractMap.SimpleImmutableEntry<>(k, v);
 	}
 
 }

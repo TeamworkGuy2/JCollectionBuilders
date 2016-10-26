@@ -4,7 +4,21 @@ This project does its best to adhere to [Semantic Versioning](http://semver.org/
 
 
 --------
-###[0.1.1](N/A) - 2016-08-25
+###[0.2.0](N/A) - 2016-10-26
+#### Added
+* Added GroupBy class with groupBy() and groupByList() methods
+* Added ListAdd.copy() with AddCondition parameter to conditionally copy Iterable items to a List
+
+#### Changed
+* Renamed ListAdd add*ToList() methods (such as addArrayToList()) to addToList() overloads
+* Added and updated unit tests
+
+#### Removed
+* Removed ListUtil copyOfKeys() and copyOfValues() - in favor of ListAdd.copy()
+
+
+--------
+###[0.1.1](https://github.com/TeamworkGuy2/JCollectionBuilders/commit/ba023070fa9e73f73e61b012a6815eb27237d203) - 2016-08-25
 #### Added
 Moved jstreamish StreamMap class methods to this project
 * ListUtil.map(T[], int, int, Function) to map sub-arrays

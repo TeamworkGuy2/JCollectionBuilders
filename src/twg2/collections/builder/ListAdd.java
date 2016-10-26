@@ -1,5 +1,6 @@
 package twg2.collections.builder;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.RandomAccess;
@@ -14,15 +15,28 @@ public final class ListAdd {
 	private ListAdd() { throw new AssertionError("cannot instantiate static class ListAdd"); }
 
 
+	/** Create a shallow copy of an iterable set of values with a given condition
+	 * @return the set of keys from the map provided or a new empty list of the map was empty
+	 * @see AddCondition
+	 */
+	public static final <T> List<T> copy(Iterable<T> values, AddCondition condition) {
+		List<T> list = new ArrayList<>();
+		if(values != null) {
+			addToList(values, list, condition);
+		}
+		return list;
+	}
+
+
 	/**
 	 * @param ary
 	 * @param dst
 	 * @param condition
 	 * @return true if the value was added successfully, false otherwise
-	 * @see #addArrayToList(Object[], List, boolean, boolean, boolean, boolean)
+	 * @see #addToList(Object[], List, boolean, boolean, boolean, boolean)
 	 */
-	public static final <T> boolean addArrayToList(T[] ary, List<? super T> dst, AddCondition condition) {
-		return addArrayToList(ary, dst, condition.doAddIfContains(), condition.doErrorIfContains(),
+	public static final <T> boolean addToList(T[] ary, List<? super T> dst, AddCondition condition) {
+		return addToList(ary, dst, condition.doAddIfContains(), condition.doErrorIfContains(),
 				condition.doAddIfNull(), condition.doErrorIfNull());
 	}
 
@@ -32,10 +46,10 @@ public final class ListAdd {
 	 * @param dst
 	 * @param condition
 	 * @return true if the value was added successfully, false otherwise
-	 * @see #addListToList(List, List, boolean, boolean, boolean, boolean)
+	 * @see #addToList(List, List, boolean, boolean, boolean, boolean)
 	 */
-	public static final <T> boolean addListToList(List<T> list, List<? super T> dst, AddCondition condition) {
-		return addListToList(list, dst, condition.doAddIfContains(), condition.doErrorIfContains(),
+	public static final <T> boolean addToList(List<T> list, List<? super T> dst, AddCondition condition) {
+		return addToList(list, dst, condition.doAddIfContains(), condition.doErrorIfContains(),
 				condition.doAddIfNull(), condition.doErrorIfNull());
 	}
 
@@ -45,11 +59,11 @@ public final class ListAdd {
 	 * @param dst
 	 * @param condition
 	 * @return true if the value was added successfully, false otherwise
-	 * @see #addCollectionToList(Collection, List, boolean, boolean, boolean, boolean)
+	 * @see #addToList(Iterable, List, boolean, boolean, boolean, boolean)
 	 */
-	public static final <T> boolean addCollectionToList(Collection<T> collection, List<? super T> dst,
+	public static final <T> boolean addToList(Iterable<T> collection, List<? super T> dst,
 			AddCondition condition) {
-		return addCollectionToList(collection, dst, condition.doAddIfContains(), condition.doErrorIfContains(),
+		return addToList(collection, dst, condition.doAddIfContains(), condition.doErrorIfContains(),
 				condition.doAddIfNull(), condition.doErrorIfNull());
 	}
 
@@ -62,9 +76,9 @@ public final class ListAdd {
 	 * @param addIfNull true to add any item, false to not add null items
 	 * @return true if the value was added successfully, false otherwise
 	 */
-	public static final <T> boolean addArrayToList(T[] ary, List<? super T> dst, boolean addIfContains,
+	public static final <T> boolean addToList(T[] ary, List<? super T> dst, boolean addIfContains,
 			boolean errorIfContains, boolean addIfNull, boolean errorIfNull) {
-		return addArrayToList(ary, 0, ary.length, dst, addIfContains, errorIfContains, addIfNull, errorIfNull);
+		return addToList(ary, 0, ary.length, dst, addIfContains, errorIfContains, addIfNull, errorIfNull);
 	}
 
 
@@ -78,7 +92,7 @@ public final class ListAdd {
 	 * @param addIfNull true to add any item, false to not add null items
 	 * @return true if the value was added successfully, false otherwise
 	 */
-	public static final <T> boolean addArrayToList(T[] ary, int off, int len, List<? super T> dst,
+	public static final <T> boolean addToList(T[] ary, int off, int len, List<? super T> dst,
 			boolean addIfContains, boolean errorIfContains, boolean addIfNull, boolean errorIfNull) {
 		if(ary == null) {
 			return false;
@@ -114,7 +128,7 @@ public final class ListAdd {
 	 * @param addIfNull true to add any item, false to not add null items
 	 * @return true if the value was added successfully, false otherwise
 	 */
-	public static final <T> boolean addListToList(List<? extends T> list, List<? super T> dst, boolean addIfContains,
+	public static final <T> boolean addToList(List<? extends T> list, List<? super T> dst, boolean addIfContains,
 			boolean errorIfContains, boolean addIfNull, boolean errorIfNull) {
 		if(list == null) {
 			return false;
@@ -171,14 +185,14 @@ public final class ListAdd {
 	 * @param addIfNull true to add any item, false to not add null items
 	 * @return true if the value was added successfully, false otherwise
 	 */
-	public static final <T> boolean addCollectionToList(Collection<? extends T> collection, List<? super T> dst,
+	public static final <T> boolean addToList(Iterable<? extends T> collection, List<? super T> dst,
 			boolean addIfContains, boolean errorIfContains, boolean addIfNull, boolean errorIfNull) {
 		if(collection == null) {
 			return false;
 		}
 		boolean result = true;
 		if(collection instanceof List) {
-			return addListToList((List<? extends T>)collection, dst, addIfContains, errorIfContains, addIfNull, errorIfNull);
+			return addToList((List<? extends T>)collection, dst, addIfContains, errorIfContains, addIfNull, errorIfNull);
 		}
 		else {
 			for(T item : collection) {

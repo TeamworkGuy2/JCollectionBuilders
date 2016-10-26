@@ -1,6 +1,6 @@
 JCollectionBuilders
 ==============
-version: 0.1.1
+version: 0.2.0
 
 Build, filter, and map methods for lists, collections, maps, iterators, and streams. 
 * ListAdd - add items to a collection with strict constraints on what can be added (duplicate values allowed or not, null allowed or not, etc.)

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.RandomAccess;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -74,33 +73,6 @@ public final class ListUtil {
 			}
 		}
 		return true;
-	}
-
-
-	/** Creates a shallow copy of the set of keys in a map with a given condition
-	 * @return the set of keys from the map provided or a new empty list of the map was empty
-	 * @see AddCondition
-	 */
-	public static final <K, V> List<K> copyOfKeys(Map<K, V> map, AddCondition condition) {
-		List<K> list = new ArrayList<K>();
-		if(map != null) {
-			ListAdd.addCollectionToList(map.keySet(), list, condition);
-		}
-		return list;
-	}
-
-
-
-	/** Creates a shallow copy of the set of keys in a map with a given condition
-	 * @return the set of keys from the map provided or a new empty list of the map was empty
-	 * @see AddCondition
-	 */
-	public static final <K, V> List<V> copyOfValues(Map<K, V> map, AddCondition condition) {
-		List<V> list = new ArrayList<V>();
-		if(map != null) {
-			ListAdd.addCollectionToList(map.values(), list, condition);
-		}
-		return list;
 	}
 
 
