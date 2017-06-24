@@ -16,7 +16,9 @@ import java.util.function.Function;
  * @author TeamworkGuy2
  * @since 2015-4-28
  */
-public class MapUtil {
+public final class MapUtil {
+
+	private MapUtil() { throw new AssertionError("cannot instantiate static class MapUtil"); }
 
 
 	/** Convert a map using a mapping function.
@@ -71,7 +73,7 @@ public class MapUtil {
 	 * @see #map(Map, BiFunction, Map)
 	 */
 	public static final <K, V> Map<K, V> filter(Map<? extends K, ? extends V> map, BiPredicate<K, V> filter) {
-		return filter(map, filter, new HashMap<>(map.size()));
+		return filter(map, filter, new HashMap<>());
 	}
 
 
@@ -95,7 +97,7 @@ public class MapUtil {
 	 * @see #filterMap(Map, BiPredicate, BiFunction, Map)
 	 */
 	public static final <K, V, R, S> Map<R, S> filterMap(Map<? extends K, ? extends V> map, BiPredicate<K, V> filter, BiFunction<K, V, Map.Entry<R, S>> transformer) {
-		return filterMap(map, filter, transformer, new HashMap<>(map.size()));
+		return filterMap(map, filter, transformer, new HashMap<>());
 	}
 
 

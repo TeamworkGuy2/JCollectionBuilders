@@ -1,5 +1,6 @@
 package twg2.collections.builder;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,7 +31,7 @@ public final class MapBuilder {
 	/** Creates an immutable map containing the entries from an iterable data set
 	 * @see #immutable(Iterable)
 	 */
-	public static final <K, V> Map<K, V> of(Iterable<Map.Entry<K, V>> iterable) {
+	public static final <K, V> Map<K, V> of(Iterable<? extends Map.Entry<K, V>> iterable) {
 		return immutable(iterable);
 	}
 
@@ -38,7 +39,7 @@ public final class MapBuilder {
 	/** Creates an immutable map containing the list of entries
 	 * @see #immutable(Iterator)
 	 */
-	public static final <K, V> Map<K, V> of(Iterator<Map.Entry<K, V>> entryIter) {
+	public static final <K, V> Map<K, V> of(Iterator<? extends Map.Entry<K, V>> entryIter) {
 		return immutable(entryIter);
 	}
 
@@ -57,7 +58,7 @@ public final class MapBuilder {
 	 * @param iterable an entry iterator containing the values to include in the map
 	 * @return a new, immutable, map containing the input iterable's entries
 	 */
-	public static final <K, V> Map<K, V> immutable(Iterable<Map.Entry<K, V>> iterable) {
+	public static final <K, V> Map<K, V> immutable(Iterable<? extends Map.Entry<K, V>> iterable) {
 		return Collections.unmodifiableMap(mutable(iterable.iterator()));
 	}
 
@@ -66,7 +67,7 @@ public final class MapBuilder {
 	 * @param entryIter an entry iterator containing the values to include in the map
 	 * @return a new, immutable, map containing the input iterator's entries
 	 */
-	public static final <K, V> Map<K, V> immutable(Iterator<Map.Entry<K, V>> entryIter) {
+	public static final <K, V> Map<K, V> immutable(Iterator<? extends Map.Entry<K, V>> entryIter) {
 		return Collections.unmodifiableMap(mutable(entryIter));
 	}
 
@@ -90,10 +91,10 @@ public final class MapBuilder {
 	 * @param entries the iterable entries to include in the map
 	 * @return a new, mutable, map containing the iterable set of input entries
 	 */
-	public static final <K, V> Map<K, V> mutable(Iterable<Map.Entry<K, V>> entries) {
+	public static final <K, V> Map<K, V> mutable(Iterable<? extends Map.Entry<K, V>> entries) {
 		Map<K, V> entryMap = new HashMap<>();
 		if(entries instanceof List && entries instanceof RandomAccess) {
-			List<Map.Entry<K, V>> entryList = (List<Map.Entry<K, V>>)entries;
+			List<? extends Map.Entry<K, V>> entryList = (List<? extends Map.Entry<K, V>>)entries;
 			for(int i = 0, size= entryList.size(); i < size; i++) {
 				Map.Entry<K, V> entry = entryList.get(i);
 				entryMap.put(entry.getKey(), entry.getValue());
@@ -108,11 +109,43 @@ public final class MapBuilder {
 	}
 
 
+	public static final <K, V> Map<K, V> mutable(Collection<K> col1, Collection<V> col2, boolean errorIfDuplicateKey) {
+		int size1 = col1.size();
+		int size2 = col2.size();
+		if(size1 != size2) {
+			throw new IllegalArgumentException("cannot combine collections with different lengths, collection 1 has " + size1 + " elements, collection 2 has " + size2);
+		}
+
+		return mutable(col1.iterator(), col2.iterator(), errorIfDuplicateKey, new HashMap<>());
+	}
+
+
+	public static final <K, V> Map<K, V> mutable(Iterator<? extends K> iterKeys, Iterator<? extends V> iterVals, boolean errorIfDuplicateKey, Map<K, V> dst) {
+		int i = 0;
+		while(iterKeys.hasNext() && iterVals.hasNext()) {
+			K key = iterKeys.next();
+			V value = iterVals.next();
+			if(errorIfDuplicateKey && dst.containsKey(key)) {
+				throw new IllegalArgumentException("duplicate key encountered while building map: " + key);
+			}
+			dst.put(key, value);
+			i++;
+		}
+
+		boolean hasKey = iterKeys.hasNext();
+		if(hasKey || iterVals.hasNext()) {
+			throw new IllegalArgumentException((!hasKey ? "keys" : "values") + " iterator had fewer elements (" + i + ") than the " + (hasKey ? "keys" : "values") + " iterator");
+		}
+
+		return dst;
+	}
+
+
 	/** Creates a mutable map containing the remaining entries from the iterator provided
 	 * @param entryIter an entry iterator containing the values to include in the map
 	 * @return a new, mutable, map containing the input iterator's entries
 	 */
-	public static final <K, V> Map<K, V> mutable(Iterator<Map.Entry<K, V>> entryIter) {
+	public static final <K, V> Map<K, V> mutable(Iterator<? extends Map.Entry<K, V>> entryIter) {
 		Map<K, V> entryMap = new HashMap<>();
 		while(entryIter.hasNext()) {
 			Map.Entry<K, V> entry = entryIter.next();

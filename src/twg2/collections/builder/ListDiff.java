@@ -9,7 +9,10 @@ import java.util.Set;
  * @author TeamworkGuy2
  * @since 2016-2-4
  */
-public class ListDiff {
+public final class ListDiff {
+
+	private ListDiff() { throw new AssertionError("cannot instantiate static class ListDiff"); }
+
 
 	/**
 	 * @param a

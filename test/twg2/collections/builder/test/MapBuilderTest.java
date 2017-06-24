@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import twg2.collections.builder.MapBuilder;
+import checks.CheckTask;
 
 /**
  * @author TeamworkGuy2
@@ -37,31 +40,38 @@ public final class MapBuilderTest {
 	};
 
 	Comparator<Entry<String, String>> strComparator = (a, b) -> a.getKey().compareTo(b.getKey());
+	Comparator<Entry<Integer, String>> intComparator = (a, b) -> a.getKey().compareTo(b.getKey());
 
 
 	@Test
-	public void mapBuilderImmutableTest() {
+	public void immutableTest() {
 		Map<String, String> map = MapBuilder.of(Arrays.asList(list1).iterator());
-		List<Entry<String, String>> listA = new ArrayList<>(map.entrySet());
-		List<Entry<String, String>> expectB = Arrays.asList(expect1);
-		// sort the lists since one came from a map
-		Collections.sort(listA, strComparator);
-		Collections.sort(expectB, strComparator);
-		Assert.assertEquals(expectB, listA);
+		entriesEqual(new ArrayList<>(map.entrySet()), Arrays.asList(expect1), strComparator);
 	}
 
 
 	@Test
-	public void mapBuilderMutableTest() {
+	public void mutableTest() {
 		Map<String, String> map = MapBuilder.mutable(Arrays.asList(list1));
 		String rmd = map.remove("__a");
 		map.put("__a", rmd);
-		List<Entry<String, String>> listA = new ArrayList<>(map.entrySet());
-		List<Entry<String, String>> expectB = Arrays.asList(expect1);
-		// sort the lists since one came from a map
-		Collections.sort(listA, strComparator);
-		Collections.sort(expectB, strComparator);
-		Assert.assertEquals(expectB, listA);
+		entriesEqual(new ArrayList<>(map.entrySet()), Arrays.asList(expect1), strComparator);
+
+		map = MapBuilder.mutable(new LinkedList<>(Arrays.asList(list1)));
+		entriesEqual(new ArrayList<>(map.entrySet()), Arrays.asList(expect1), strComparator);
+	}
+
+
+	@Test
+	public void mutableCombine() {
+		List<Integer> ids = Arrays.asList(1, 1, 2, 3, 5, 8, 13, 21); // duplicate '1' key
+		List<String> names = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H");
+		Map<Integer, String> map = MapBuilder.mutable(ids, new HashSet<>(names), false);
+		Assert.assertTrue(map.containsKey(2));
+		Assert.assertFalse(map.containsValue("A"));
+		entriesEqual(new ArrayList<>(map.entrySet()), Arrays.asList(pair(1, "B"), pair(2, "C"), pair(3, "D"), pair(5, "E"), pair(8, "F"), pair(13, "G"), pair(21, "H")), intComparator);
+
+		CheckTask.assertException(() -> MapBuilder.mutable(ids, new HashSet<>(names), true));
 	}
 
 
@@ -127,6 +137,14 @@ public final class MapBuilderTest {
 			Map<String, RetentionPolicy> map = MapBuilder.immutableEnumNames(RetentionPolicy.class, (r) -> r.name() + "@" + r.hashCode());
 			Assert.assertEquals(expect, map);
 		}
+	}
+
+
+	public static final <K, V> void entriesEqual(List<? extends Map.Entry<K, V>> actual, List<? extends Map.Entry<K, V>> expected, Comparator<Entry<K, V>> comparator) {
+		// sort the lists since one came from a map
+		Collections.sort(expected, comparator);
+		Collections.sort(actual, comparator);
+		Assert.assertEquals(expected, actual);
 	}
 
 

@@ -10,7 +10,9 @@ import java.util.List;
  * @author TeamworkGuy2
  * @since 2015-4-18
  */
-public class ListBuilder {
+public final class ListBuilder {
+
+	private ListBuilder() { throw new AssertionError("cannot instantiate static class ListBuilder"); }
 
 
 	@SafeVarargs

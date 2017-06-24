@@ -28,15 +28,12 @@ public class ListAddTest {
 			ListAdd.addToList(new String[] { "a", "ab", "abc", null }, strs, AddCondition.NO_NULL);
 			Assert.assertEquals("invalid number of strings", strs.size(), 3);
 
-			// add a subset of an array, also throw errors if null
-			CheckTask.assertException(() -> {
-				ListAdd.addToList(new String[] { "b", null, "c" }, 1, 1, strs, true, false, false, true);
-			});
+			// add a subset of an array, also throw error if null
+			CheckTask.assertException(() -> ListAdd.addToList(new String[] { "b", null, "c" }, 1, 1, strs, true, false, false, true));
+			CheckTask.assertException(() -> ListAdd.addToList(new String[] { "a" }, 0, 1, strs, false, true, false, true));
 
-			// add items with a duplicate at the end and throw errors if contains, and catch error
-			CheckTask.assertException(() -> {
-				ListAdd.addToList(Arrays.asList("c", "d", "e", "a"), strs, AddCondition.ERROR_CONTAINS);
-			});
+			// add items with a duplicate at the end and throw error if contains, and catch error
+			CheckTask.assertException(() -> ListAdd.addToList(Arrays.asList("c", "d", "e", "a"), strs, AddCondition.ERROR_CONTAINS));
 			Assert.assertTrue("lists not equal", Arrays.asList("a", "ab", "abc", "c", "d", "e").equals(strs));
 
 			// add items with duplicates, but don't allow duplicates and check for duplicates
@@ -57,6 +54,7 @@ public class ListAddTest {
 
 			// add items with nulls, but no duplicates
 			ListAdd.addToList(new LinkedList<>(Arrays.asList(1, 2, null)), list, AddCondition.NO_CONTAINS);
+			CheckTask.assertException(() -> ListAdd.addToList(Arrays.asList(1), list, AddCondition.ERROR_CONTAINS));
 			Assert.assertEquals(Arrays.asList(1, 2, null), list);
 		}
 	}

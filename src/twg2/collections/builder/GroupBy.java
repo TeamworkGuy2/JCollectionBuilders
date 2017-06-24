@@ -12,7 +12,7 @@ import java.util.function.Function;
  * @author TeamworkGuy2
  * @since 2016-10-26
  */
-public class GroupBy {
+public final class GroupBy {
 
 	private GroupBy() { throw new AssertionError("Cannot instantiate static class GroupBy"); }
 

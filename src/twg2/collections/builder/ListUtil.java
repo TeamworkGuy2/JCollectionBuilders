@@ -19,7 +19,6 @@ import java.util.stream.BaseStream;
  */
 public final class ListUtil {
 
-
 	private ListUtil() { throw new AssertionError("cannot instantiate static class ListUtil"); }
 
 
