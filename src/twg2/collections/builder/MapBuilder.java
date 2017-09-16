@@ -219,12 +219,38 @@ public final class MapBuilder {
 	}
 
 
+	/** Combine a list of maps into one map according to the {@link Map#putAll(Map)} contract.<br>
+	 * Duplicate keys are overwritten. Keys from the last map of {@code maps} taking
+	 * precedence over keys from the second to last map and keys from the second to last
+	 * map taking precedence over keys from the third to last map, etc.
+	 * @param maps the list of maps to combine
+	 * @return a single map containing all of the non-duplicate key-value pairs from all of the {@code maps}
+	 */
+	public static final <K, V> Map<K, V> concat(Iterable<? extends Map<? extends K, ? extends V>> maps) {
+		Map<K, V> combinedMap = new HashMap<K, V>();
+		for(Map<? extends K, ? extends V> map : maps) {
+			combinedMap.putAll(map);
+		}
+		return combinedMap;
+	}
+
+
+	/** Create a new inverted map by swapping the keys with the values of the given source map
+	 * @param source the source map
+	 * @return the inverted map
+	 */
 	public static final <K, V> Map<V, K> invert(Map<K, V> source) {
 		Map<V, K> dst = new HashMap<>();
 		return invert(source, dst);
 	}
 
 
+	/** Copy and swap key-values from a source map to a destination map.
+	 * If the a duplicate destination map key is encountered, the operation is aborted when that duplicate is reached via {@code source.iterator()} traversal order. 
+	 * @param source the source map
+	 * @param dst the destination map
+	 * @return the destination map
+	 */
 	public static final <K, V> Map<V, K> invert(Map<K, V> source, Map<V, K> dst) {
 		boolean res = tryInvert(source, dst);
 		if(!res) {
@@ -234,6 +260,13 @@ public final class MapBuilder {
 	}
 
 
+	/** Try to copy and swap key-values from a source map to a destination map.
+	 * Key-values are copy-swapped from source to dst in {@code source.iterator()} traversal order.
+	 * When a source value is encountered that already exists in the destination, false is returned. All key-values moved up to that point remain in the destination map.
+	 * @param source the source map
+	 * @param dst the destination map
+	 * @return true if all key-values were swapped into the destination, false if a duplicate was encountered.
+	 */
 	public static final <K, V> boolean tryInvert(Map<K, V> source, Map<V, K> dst) {
 		for(Entry<? extends K, ? extends V> entry : source.entrySet()) {
 			if(dst.containsKey(entry.getValue())) {

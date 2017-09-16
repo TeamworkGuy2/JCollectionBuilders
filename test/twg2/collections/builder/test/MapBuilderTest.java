@@ -96,6 +96,7 @@ public final class MapBuilderTest {
 		m3.put("5", "e5");
 
 		Assert.assertEquals(all, MapBuilder.concat(m1, m2, m3));
+		Assert.assertEquals(all, MapBuilder.concat(Arrays.asList(m1, m2, m3)));
 	}
 
 

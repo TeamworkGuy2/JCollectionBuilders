@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -21,6 +22,8 @@ import checks.CheckTask;
 public class MapUtilTest {
 	Map<String, String> map1 = new HashMap<>();
 	Map<String, String> duplicates1 = new LinkedHashMap<>();
+	List<Entry<String, String>> deduplicatesFirst = Arrays.asList(pair("A", "Alpha"), pair("B", "Beta"));
+	List<Entry<String, String>> deduplicatesLast = Arrays.asList(pair("A", "Alpha"), pair("B", "2"));
 
 	Comparator<Entry<String, String>> strComparator = (a, b) -> a.getKey().compareTo(b.getKey());
 
@@ -51,14 +54,33 @@ public class MapUtilTest {
 
 
 	@Test
-	public void checkNewKeyUniqueness() {
+	public void checkNewKeyUniquenessEntries() {
 		Map<String, String> res = MapUtil.mapCheckNewKeyUniqueness(duplicates1, (k, v) -> pair(k.substring(0, 1), v), true, false);
-		MapBuilderTest.entriesEqual(new ArrayList<>(res.entrySet()), Arrays.asList(pair("A", "Alpha"), pair("B", "Beta")), strComparator);
+		MapBuilderTest.entriesEqual(new ArrayList<>(res.entrySet()), deduplicatesFirst, strComparator);
 
 		res = MapUtil.mapCheckNewKeyUniqueness(duplicates1, (k, v) -> pair(k.substring(0, 1), v), false, false);
-		MapBuilderTest.entriesEqual(new ArrayList<>(res.entrySet()), Arrays.asList(pair("A", "Alpha"), pair("B", "2")), strComparator);
+		MapBuilderTest.entriesEqual(new ArrayList<>(res.entrySet()), deduplicatesLast, strComparator);
 
 		CheckTask.assertException(() -> MapUtil.mapCheckNewKeyUniqueness(duplicates1, (k, v) -> pair(k.substring(0, 1), v), true, true));
+	}
+
+
+	@Test
+	public void checkNewKeyUniquenessKeyValues() {
+		Map<String, String> res = MapUtil.mapCheckNewKeyUniqueness(duplicates1, (k) -> k.substring(0, 1), (v) -> v, true, false);
+		MapBuilderTest.entriesEqual(new ArrayList<>(res.entrySet()), deduplicatesFirst, strComparator);
+
+		res = MapUtil.mapCheckNewKeyUniqueness(duplicates1, (k) -> k.substring(0, 1), (v) -> v, false, false);
+		MapBuilderTest.entriesEqual(new ArrayList<>(res.entrySet()), deduplicatesLast, strComparator);
+
+		CheckTask.assertException(() -> MapUtil.mapCheckNewKeyUniqueness(duplicates1, (k) -> k.substring(0, 1), (v) -> v, true, true));
+	}
+
+
+	@Test
+	public void map() {
+		Map<String, String> res1 = MapUtil.map(map1.entrySet(), (kv) -> pair(kv.getKey(), kv.getValue()));
+		MapBuilderTest.entriesEqual(new ArrayList<>(res1.entrySet()), new ArrayList<>(map1.entrySet()), strComparator);
 	}
 
 
